@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Kelola Pengguna{% endblock %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="fw-bold text-primary">Kelola Pengguna</h1>
+        <p class="lead">Lihat dan atur peran pengguna.</p>
+    </div>
+</div>
+
+<div class="mb-3 text-end">
+    <a href="{{ url_for('add_admin') }}" class="btn btn-success">Tambah Admin Baru</a>
+</div>
+
+{% if users %}
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Peran</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    {% if user.role == 'admin' %}
+                        <span class="badge bg-danger">Admin</span>
+                    {% else %}
+                        <span class="badge bg-info">Customer</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user.id != current_user.id %} {# Tidak bisa mengubah peran diri sendiri #}
+                        <form action="{{ url_for('toggle_admin_status', user_id=user.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-sm {% if user.role == 'admin' %}btn-secondary{% else %}btn-primary{% endif %}"
+    data-user-id="{{ user.id }}"
+    data-username="{{ user.username }}"
+    data-current-role="{{ user.role }}"
+    data-toggle-role-url="{{ url_for('toggle_admin_status', user_id=user.id) }}"
+    class="btn-toggle-role"> {# Tambahkan class untuk identifikasi #}
+    {% if user.role == 'admin' %}Jadikan Pelanggan{% else %}Jadikan Admin{% endif %}
+</button>
+                        </form>
+                    {% else %}
+                        <span class="text-muted">Ini Anda</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info text-center" role="alert">
+    Tidak ada pengguna terdaftar.
+</div>
+{% endif %}
+{% endblock %}

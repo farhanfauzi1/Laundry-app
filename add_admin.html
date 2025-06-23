@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Tambah Admin Baru{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card card-form mt-5">
+            <h2 class="text-center mb-4">Tambah Admin Baru</h2>
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ form.username.label(class="form-label") }}
+                    {{ form.username(class="form-control", placeholder="Nama Pengguna Admin") }}
+                    {% for error in form.username.errors %}
+                        <span class="text-danger small">{{ error }}</span><br>
+                    {% endfor %}
+                </div>
+                <div class="mb-3">
+                    {{ form.email.label(class="form-label") }}
+                    {{ form.email(class="form-control", placeholder="email_admin@contoh.com") }}
+                    {% for error in form.email.errors %}
+                        <span class="text-danger small">{{ error }}</span><br>
+                    {% endfor %}
+                </div>
+                <div class="mb-3">
+                    {{ form.password.label(class="form-label") }}
+                    {{ form.password(class="form-control", placeholder="Kata Sandi Admin") }}
+                    {% for error in form.password.errors %}
+                        <span class="text-danger small">{{ error }}</span><br>
+                    {% endfor %}
+                </div>
+                <div class="mb-3">
+                    {{ form.confirm_password.label(class="form-label") }}
+                    {{ form.confirm_password(class="form-control", placeholder="Konfirmasi Kata Sandi") }}
+                    {% for error in form.confirm_password.errors %}
+                        <span class="text-danger small">{{ error }}</span><br>
+                    {% endfor %}
+                </div>
+                <div class="d-grid gap-2">
+                    {{ form.submit(class="btn btn-success btn-lg") }}
+                </div>
+            </form>
+            <div class="text-center mt-3">
+                <a href="{{ url_for('manage_users') }}" class="btn btn-outline-secondary">Kembali ke Kelola Pengguna</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

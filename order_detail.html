@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Detail Pesanan #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Detail Pesanan #{{ order.id }}</h2>
+    <div class="card">
+        <div class="card-body">
+            <p><strong>Status:</strong> <span class="badge bg-{{ 'primary' if order.status == 'Pending' else ('info' if order.status == 'Processing' else ('success' if order.status == 'Completed' else 'danger')) }}">{{ order.status }}</span></p>
+            <p><strong>Layanan:</strong> {{ order.service.name }}</p> {# Konsisten: order.service.name #}
+            <p><strong>Berat (kg):</strong> {{ order.weight if order.weight is not none else 'Belum ditentukan' }}</p>
+            <p><strong>Total Harga:</strong> Rp {{ "{:,.0f}".format(order.total_price) if order.total_price is not none else 'Belum dihitung' }}</p>
+            <p><strong>Tanggal & Waktu Jemput:</strong> {{ order.pickup_datetime.strftime('%d/%m/%Y %H:%M') }}</p> {# Konsisten: order.pickup_datetime #}
+            <p><strong>Alamat:</strong> {{ order.address }}</p>
+            <p><strong>Tanggal Pesan:</strong> {{ order.order_date.strftime('%d/%m/%Y %H:%M') }}</p> {# Konsisten: order.order_date #}
+
+            {% if order.payment %}
+            <hr>
+            <h5>Detail Pembayaran</h5>
+            <p><strong>Status Pembayaran:</strong> <span class="badge bg-{{ 'success' if order.payment.status == 'Paid' else 'warning' }}">{{ order.payment.status }}</span></p>
+            <p><strong>Metode Pembayaran:</strong> {{ order.payment.method }}</p>
+            <p><strong>Tanggal Pembayaran:</strong> {{ order.payment.payment_date.strftime('%d/%m/%Y %H:%M') if order.payment.payment_date else 'N/A' }}</p>
+            <p><strong>Jumlah Dibayar:</strong> Rp {{ "{:,.0f}".format(order.payment.amount) if order.payment.amount is not none else 'N/A' }}</p>
+            {% else %}
+            <p>Belum ada detail pembayaran.</p>
+            {% endif %}
+
+            <a href="{{ url_for('customer_dashboard') }}" class="btn btn-secondary mt-3">Kembali ke Dashboard</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

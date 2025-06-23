@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Pelanggan{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Dashboard Pelanggan</h2>
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4>Pesanan Anda</h4>
+                <a href="{{ url_for('place_order') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Buat Pesanan Baru
+                </a>
+            </div>
+
+            {% if orders %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID Pesanan</th>
+                            <th>Layanan</th>
+                            <th>Tanggal Jemput</th>
+                            <th>Berat (kg)</th>
+                            <th>Total Harga</th>
+                            <th>Status</th>
+                            <th>Tanggal Pesan</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>#{{ order.id }}</td>
+                            <td>{{ order.service.name }}</td>
+                            <td>{{ order.pickup_datetime.strftime('%d %b %Y, %H:%M') }}</td>
+                            <td>{{ order.weight if order.weight is not none else 'Belum ditentukan' }}</td>
+                            <td>Rp{{ "{:,.0f}".format(order.total_price) if order.total_price is not none else 'Belum dihitung' }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'primary' if order.status == 'Pending' else ('info' if order.status == 'Processing' else ('success' if order.status == 'Completed' else 'danger')) }}">
+                                    {{ order.status }}
+                                </span>
+                            </td>
+                            <td>{{ order.order_date.strftime('%d %b %Y') }}</td>
+                            <td>
+                                <a href="{{ url_for('order_detail', order_id=order.id) }}" class="btn btn-info btn-sm">Detail</a>
+                                {% if order.status == 'Completed' and order.total_price is not none %}
+                                    {% set existing_payment = order.payments|selectattr('status', 'equalto', 'Paid')|list %}
+                                    {% if not existing_payment %}
+                                    <a href="{{ url_for('checkout', order_id=order.id) }}" class="btn btn-success btn-sm">Bayar</a>
+                                    {% endif %}
+                                {% endif %}
+                                {% if order.status == 'Pending' %}
+                                <form action="{{ url_for('cancel_order', order_id=order.id) }}" method="POST" class="d-inline">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?');">Batal</button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <h5>Belum ada pesanan</h5>
+                <p>Anda belum memiliki pesanan. <a href="{{ url_for('place_order') }}" class="alert-link">Buat pesanan pertama Anda</a> sekarang!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Edit Layanan: {{ service.name }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <div class="card card-form mt-4">
+            <h2 class="text-center mb-4">Edit Layanan: {{ service.name }}</h2>
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ form.name.label(class="form-label") }}
+                    {{ form.name(class="form-control") }}
+                    {% for error in form.name.errors %}
+                        <span class="text-danger small">{{ error }}</span><br>
+                    {% endfor %}
+                </div>
+                <div class="mb-3">
+                    {{ form.price_per_kg.label(class="form-label") }}
+                    {{ form.price_per_kg(class="form-control", type="number", step="100") }}
+                    {% for error in form.price_per_kg.errors %}
+                        <span class="text-danger small">{{ error }}</span><br>
+                    {% endfor %}
+                </div>
+                <div class="mb-3">
+                    {{ form.description.label(class="form-label") }}
+                    {{ form.description(class="form-control", rows="3") }}
+                    {% for error in form.description.errors %}
+                        <span class="text-danger small">{{ error }}</span><br>
+                    {% endfor %}
+                </div>
+                <div class="d-grid gap-2 mt-4">
+                    {{ form.submit(class="btn btn-primary btn-lg") }}
+                </div>
+            </form>
+            <div class="text-center mt-3">
+                <a href="{{ url_for('manage_services') }}" class="btn btn-outline-secondary">Kembali ke Kelola Layanan</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

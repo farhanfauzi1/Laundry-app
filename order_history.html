@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Detail Pesanan #{{ order.id }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-9 col-lg-8">
+        <div class="card card-form mt-4">
+            <h2 class="text-center mb-4">Detail Pesanan #{{ order.id }}</h2>
+            <div class="row mb-3">
+                <div class="col-sm-4 text-muted">Pelanggan:</div>
+                <div class="col-sm-8">{{ order.customer.username }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 text-muted">Email Pelanggan:</div>
+                <div class="col-sm-8">{{ order.customer.email }}</div>
+            </div>
+            <hr>
+            <div class="row mb-3">
+                <div class="col-sm-4 text-muted">Layanan:</div>
+                <div class="col-sm-8">{{ order.service.name }}</div> {# KOREKSI: service_type.name -> service.name #}
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 text-muted">Harga/KG:</div>
+                <div class="col-sm-8">Rp{{ "{:,.0f}".format(order.service.price_per_kg) }}</div> {# KOREKSI: service_type.price_per_kg -> service.price_per_kg #}
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 text-muted">Berat (kg):</div>
+                <div class="col-sm-8">{{ order.weight if order.weight is not none else 'Belum ditentukan' }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 text-muted">Total Harga:</div>
+                <div class="col-sm-8">Rp{{ "{:,.0f}".format(order.total_price) if order.total_price is not none else 'Belum dihitung' }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 text-muted">Tanggal & Waktu Jemput:</div>
+                <div class="col-sm-8">{{ order.pickup_datetime.strftime('%d %b %Y, %H:%M') }}</div> {# Konsisten: pickup_datetime #}
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 text-muted">Alamat:</div>
+                <div class="col-sm-8">{{ order.address }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 text-muted">Status Pesanan:</div>
+                <div class="col-sm-8"><span class="badge bg-{{ 'primary' if order.status == 'Pending' else ('info' if order.status == 'Processing' else ('success' if order.status == 'Completed' else 'danger')) }}">{{ order.status }}</span></div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 text-muted">Dipesan Pada:</div>
+                <div class="col-sm-8">{{ order.order_date.strftime('%d %b %Y, %H:%M') }}</div> {# Konsisten: order_date #}
+            </div>
+
+            {% if order.payment %}
+            <hr>
+            <h5>Detail Pembayaran</h5>
+            <div class="row mb-3">
+                <div class="col-sm-4 text-muted">Metode Pembayaran:</div>
+                <div class="col-sm-8">{{ order.payment.method }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 text-muted">Jumlah Dibayar:</div>
+                <div class="col-sm-8">Rp{{ "{:,.0f}".format(order.payment.amount) }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 text-muted">Status Pembayaran:</div>
+                <div class="col-sm-8"><span class="badge bg-{{ 'success' if order.payment.status == 'Paid' else 'warning' }}">{{ order.payment.status }}</span></div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4 text-muted">Dibayar Pada:</div>
+                <div class="col-sm-8">{{ order.payment.payment_date.strftime('%d %b %Y, %H:%M') if order.payment.payment_date else 'N/A' }}</div> {# KOREKSI: paid_at -> payment_date #}
+            </div>
+            {% endif %}
+
+            <div class="mt-4 text-center">
+                {% if current_user.role == 'customer' %}
+                    <a href="{{ url_for('customer_dashboard') }}" class="btn btn-secondary me-2">Kembali ke Dashboard</a>
+                    {% if order.status == 'Pending' %}
+                        <form action="{{ url_for('cancel_order', order_id=order.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?');">Batalkan Pesanan</button>
+                        </form>
+                    {% elif order.status == 'Completed' and not order.payment %} {# KOREKSI: 'Done' -> 'Completed' #}
+                        <a href="{{ url_for('checkout', order_id=order.id) }}" class="btn btn-success">Lanjutkan Pembayaran</a> {# Pastikan rute 'checkout' ada #}
+                    {% endif %}
+                {% elif current_user.role == 'admin' %}
+                    <a href="{{ url_for('manage_orders') }}" class="btn btn-secondary me-2">Kembali ke Kelola Pesanan</a>
+                    <a href="{{ url_for('update_order', order_id=order.id) }}" class="btn btn-warning">Edit Pesanan</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

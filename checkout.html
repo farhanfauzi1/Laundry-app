@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Checkout Pesanan #{{ order.id }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <div class="card card-form mt-4">
+            <h2 class="text-center mb-4">Checkout Pesanan #{{ order.id }}</h2>
+
+            <div class="mb-3">
+                <p><strong>Layanan:</strong> {{ order.service.name }}</p>
+                <p><strong>Berat:</strong> {{ "%.2f"|format(order.weight) }} kg</p>
+                <p class="h4"><strong>Total Harga: <span class="text-success">Rp{{ "{:,.0f}".format(order.total_price) }}</span></strong></p>
+            </div>
+            <hr>
+
+            <p class="text-info">Pilih metode pembayaran Anda. (Simulasi pembayaran)</p>
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ form.payment_method.label(class="form-label") }}
+                    {{ form.payment_method(class="form-select") }}
+                    {% for error in form.payment_method.errors %}
+                        <span class="text-danger small">{{ error }}</span><br>
+                    {% endfor %}
+                </div>
+                <div class="d-grid gap-2 mt-4">
+                    {{ form.submit(class="btn btn-success btn-lg") }}
+                </div>
+            </form>
+            <div class="text-center mt-3">
+                <a href="{{ url_for('order_detail', order_id=order.id) }}" class="btn btn-secondary">Kembali ke Detail Pesanan</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

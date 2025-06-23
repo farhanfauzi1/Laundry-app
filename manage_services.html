@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Kelola Layanan{% endblock %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="fw-bold text-primary">Kelola Layanan</h1>
+        <p class="lead">Tambah, edit, atau hapus layanan laundry yang tersedia.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card card-form">
+            <div class="card-body">
+                <h3 class="mb-3 text-secondary">Tambah Layanan Baru</h3>
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.name.label(class="form-label") }}
+                        {{ form.name(class="form-control", placeholder="Misal: Cuci Kering, Cuci Setrika") }}
+                        {% for error in form.name.errors %}
+                            <span class="text-danger small">{{ error }}</span><br>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.price_per_kg.label(class="form-label") }}
+                        {{ form.price_per_kg(class="form-control", type="number", step="100") }}
+                        {% for error in form.price_per_kg.errors %}
+                            <span class="text-danger small">{{ error }}</span><br>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.description.label(class="form-label") }}
+                        {{ form.description(class="form-control", rows="3", placeholder="Deskripsi singkat tentang layanan") }}
+                        {% for error in form.description.errors %}
+                            <span class="text-danger small">{{ error }}</span><br>
+                        {% endfor %}
+                    </div>
+                    <div class="d-grid">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <h3 class="mb-3 text-secondary">Layanan Yang Ada</h3>
+        {% if services %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Nama Layanan</th>
+                        <th>Harga/KG</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for service in services %}
+                    <tr>
+                        <td>{{ service.name }}</td>
+                        <td>Rp{{ "{:,.0f}".format(service.price_per_kg) }}</td>
+                        <td>
+                            <a href="{{ url_for('edit_service', service_id=service.id) }}" class="btn btn-sm btn-warning me-1">Edit</a>
+                            <form action="{{ url_for('delete_service', service_id=service.id) }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus layanan ini? Ini mungkin mempengaruhi pesanan yang sudah ada.');">Hapus</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info text-center" role="alert">
+            Belum ada layanan yang ditambahkan.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

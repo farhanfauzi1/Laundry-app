@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Beranda{% endblock %}
+{% block content %}
+<div class="jumbotron">
+    <h1 class="display-4">Selamat Datang di LaundryApp!</h1>
+    <p class="lead">Solusi laundry praktis dan modern untuk Anda.</p>
+    <hr class="my-4">
+    <p>Kami menawarkan layanan laundry berkualitas dengan penjemputan dan pengiriman yang mudah.</p>
+    {% if not current_user.is_authenticated %}
+        <a class="btn btn-primary btn-lg me-2" href="{{ url_for('register') }}" role="button">Daftar Sekarang</a>
+        <a class="btn btn-outline-primary btn-lg" href="{{ url_for('login') }}" role="button">Masuk</a>
+    {% else %}
+        {% if current_user.role == 'customer' %}
+            <a class="btn btn-primary btn-lg" href="{{ url_for('place_order') }}" role="button">Buat Pesanan Sekarang</a>
+        {% elif current_user.role == 'admin' %}
+             <a class="btn btn-primary btn-lg" href="{{ url_for('admin_dashboard') }}" role="button">Ke Dashboard Admin</a>
+        {% endif %}
+    {% endif %}
+</div>
+
+<div class="row mt-5">
+    <div class="col-12 text-center mb-4">
+        <h2 class="fw-bold text-secondary">Layanan Kami</h2>
+    </div>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for service in services %}
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ service.name }}</h5>
+                    <p class="card-text">{{ service.description if service.description else "Layanan pencucian profesional untuk pakaian Anda." }}</p>
+                    <p class="card-text"><strong class="text-success">Harga: Rp{{ "{:,.0f}".format(service.price_per_kg) }}/kg</strong></p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% if not services %}
+            <div class="col-12 text-center">
+                <p class="text-muted">Belum ada layanan yang tersedia. Silakan hubungi admin.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mt-5 text-center">
+    <div class="col-md-4">
+        <div class="dashboard-card">
+            <h3 class="fw-bold text-primary">Penjemputan Mudah</h3>
+            <p>Jadwalkan penjemputan pakaian Anda kapan saja dan di mana saja.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="dashboard-card">
+            <h3 class="fw-bold text-primary">Kualitas Terjamin</h3>
+            <p>Pakaian Anda akan dicuci dengan standar tertinggi menggunakan teknologi modern.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="dashboard-card">
+            <h3 class="fw-bold text-primary">Pengiriman Cepat</h3>
+            <p>Kami mengembalikan pakaian Anda yang bersih tepat waktu ke pintu Anda.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

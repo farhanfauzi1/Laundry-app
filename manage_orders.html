@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Kelola Pesanan{% endblock %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="fw-bold text-primary">Kelola Pesanan</h1>
+        <p class="lead">Lihat dan update semua pesanan laundry.</p>
+    </div>
+</div>
+
+<div class="mb-3 d-flex justify-content-between align-items-center">
+    <h3 class="text-secondary">Daftar Pesanan</h3>
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="statusFilter" data-bs-toggle="dropdown" aria-expanded="false">
+            Filter Status: {{ (status_filter|default('Semua')).replace('_', ' ').title() if status_filter else 'Semua' }}
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="statusFilter">
+            <li><a class="dropdown-item {% if not status_filter or status_filter == 'all' %}active{% endif %}" href="{{ url_for('manage_orders', status='all') }}">Semua</a></li>
+            <li><a class="dropdown-item {% if status_filter == 'Pending' %}active{% endif %}" href="{{ url_for('manage_orders', status='Pending') }}">Pending</a></li>
+            <li><a class="dropdown-item {% if status_filter == 'Picked Up' %}active{% endif %}" href="{{ url_for('manage_orders', status='Picked Up') }}">Dijemput</a></li>
+            <li><a class="dropdown-item {% if status_filter == 'Washing' %}active{% endif %}" href="{{ url_for('manage_orders', status='Washing') }}">Pencucian</a></li>
+            <li><a class="dropdown-item {% if status_filter == 'Done' %}active{% endif %}" href="{{ url_for('manage_orders', status='Done') }}">Selesai</a></li>
+            <li><a class="dropdown-item {% if status_filter == 'Paid' %}active{% endif %}" href="{{ url_for('manage_orders', status='Paid') }}">Dibayar</a></li>
+            <li><a class="dropdown-item {% if status_filter == 'Delivered' %}active{% endif %}" href="{{ url_for('manage_orders', status='Delivered') }}">Dikirim</a></li>
+            <li><a class="dropdown-item {% if status_filter == 'Cancelled' %}active{% endif %}" href="{{ url_for('manage_orders', status='Cancelled') }}">Dibatalkan</a></li>
+        </ul>
+    </div>
+</div>
+
+{% if orders %}
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Pelanggan</th>
+                <th>Layanan</th>
+                <th>Tanggal Jemput</th>
+                <th>Berat (kg)</th>
+                <th>Total Harga</th>
+                <th>Status</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>#{{ order.id }}</td>
+                <td>{{ order.customer.username }}</td>
+                <td>{{ order.service.name }}</td>
+                <td>{{ order.pickup_datetime.strftime('%d %b %Y, %H:%M') }}</td>
+                <td>{{ "%.2f"|format(order.weight) if order.weight else 'N/A' }}</td>
+                <td>{{ "Rp{:,.0f}".format(order.total_price) if order.total_price else 'N/A' }}</td>
+                <td>
+                    {% if order.status == 'Pending' %}<span class="badge bg-warning text-dark">{{ order.status }}</span>
+                    {% elif order.status == 'Picked Up' %}<span class="badge bg-info">{{ order.status }}</span>
+                    {% elif order.status == 'Washing' %}<span class="badge bg-primary">{{ order.status }}</span>
+                    {% elif order.status == 'Done' %}<span class="badge bg-success">{{ order.status }}</span>
+                    {% elif order.status == 'Paid' %}<span class="badge bg-success">Dibayar</span>
+                    {% elif order.status == 'Delivered' %}<span class="badge bg-secondary">Dikirim</span>
+                    {% elif order.status == 'Cancelled' %}<span class="badge bg-danger">Dibatalkan</span>
+                    {% else %}<span class="badge bg-light text-dark">{{ order.status }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('update_order', order_id=order.id) }}" class="btn btn-sm btn-warning me-1">Update</a>
+                    <a href="{{ url_for('order_detail', order_id=order.id) }}" class="btn btn-sm btn-info">Detail</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info text-center" role="alert">
+    Tidak ada pesanan dengan status "{{ status_filter|default('Semua') }}".
+</div>
+{% endif %}
+{% endblock %}
